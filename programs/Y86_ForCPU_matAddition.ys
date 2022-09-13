@@ -1,0 +1,63 @@
+
+init:
+  irmovl 0x140, %ebp #
+  irmovl 0x140, %esp
+  irmovl $1, %esi #esi = 1
+  rmmovl %esi, -20(%ebp) #a[0][0] = esi
+  irmovl $7, %esi #esi = 7
+  rmmovl %esi, -16(%ebp) #a[0][1] = esi
+  irmovl $4, %esi #esi = 4
+  rmmovl %esi, -12(%ebp) #a[1][0] = esi
+  irmovl $2, %esi #esi = 2
+  rmmovl %esi, -8(%ebp) #a[1][1] = esi
+  irmovl $9, %esi #esi = 9
+  rmmovl %esi, -36(%ebp) #b[0][0] = esi
+  irmovl $3, %esi #esi = 3
+  rmmovl %esi, -32(%ebp) #b[0][1] = esi
+  irmovl $6, %esi #esi = 6
+  rmmovl %esi, -28(%ebp) #b[1][0] = esi
+  irmovl $8, %esi #esi = 8
+  rmmovl %esi, -24(%ebp) #b[1][1] = esi
+  irmovl $4, %esi #esi = 4
+  rmmovl %esi, -4(%ebp) #count = esi = 4
+  irmovl $0, %esi #esi = 0
+  rmmovl %esi, (%ebp) #i = esi = 0
+  rrmovl %ebp, %eax #eax = ebp, then subtract 48 (ADDR 00d0)
+  irmovl $-20, %esi
+  addl %esi, %eax #eax = a[][]
+  rrmovl %ebp, %ebx #ebx = ebp, then subtract 64 (ADDR 00c0)
+  irmovl $-36, %esi
+  addl %esi, %ebx #ebx = b[][]
+  rrmovl %ebp, %ecx #ecx = ebp, then subtract 80 (ADDR 00b0)
+  irmovl $-52, %esi
+  addl %esi, %ecx #ecx = c[][]
+  rrmovl %ebp, %edx #edx = ebp, then subtract 28 (ADDR 00e4)
+  irmovl $0, %esi
+  addl %esi, %edx #edx = i
+L1:
+  irmovl $0, %esi
+  mrmovl (%eax), %esi #esi = *pa
+  irmovl $0, %edi
+  mrmovl (%ebx), %edi #edi = *pb
+  addl %esi, %edi #edi = *pa + *pb
+  rmmovl %edi, (%ecx) #*pc = *pa + *pb
+  irmovl $4, %esi #esi = 4
+  addl %esi, %eax #pa +=1
+  addl %esi, %ebx #pb +=1
+  addl %esi, %ecx #pc +=1
+  irmovl $1, %esi #esi = 1
+  irmovl $0, %edi #clear edi
+  mrmovl (%edx), %edi #edi = *i
+  addl %esi, %edi #i++
+  rmmovl %edi, (%edx) #setting value of i in mem
+  irmovl $-1, %esi # making esi -1, to multiply it with i 
+  addl %esi, %edi #multiply edi (i) by -1 [CHANGE addl opcode to mul opcode]
+  mrmovl -4(%ebp), %esi #esi = count
+  addl %edi, %esi #esi = count + -i
+  je L2 ##jump if count==i
+  jmp L1 #jump if count>i     (i<count)
+L2:
+  halt
+
+.pos 0x140
+Stack:

@@ -1,0 +1,63 @@
+                      | 
+  0x000:              | init:
+  0x000: 30f540010000 |   irmovl 0x140, %ebp #
+  0x006: 30f440010000 |   irmovl 0x140, %esp #
+  0x00c: 30f601000000 |   irmovl $1, %esi #esi = 1
+  0x012: 4065ecffffff |   rmmovl %esi, -20(%ebp) #a[0][0] = esi
+  0x018: 30f607000000 |   irmovl $7, %esi #esi = 7
+  0x01e: 4065f0ffffff |   rmmovl %esi, -16(%ebp) #a[0][1] = esi
+  0x024: 30f604000000 |   irmovl $4, %esi #esi = 4
+  0x02a: 4065f4ffffff |   rmmovl %esi, -12(%ebp) #a[1][0] = esi
+  0x030: 30f602000000 |   irmovl $2, %esi #esi = 2
+  0x036: 4065f8ffffff |   rmmovl %esi, -8(%ebp) #a[1][1] = esi
+  0x03c: 30f609000000 |   irmovl $9, %esi #esi = 9
+  0x042: 4065dcffffff |   rmmovl %esi, -36(%ebp) #b[0][0] = esi
+  0x048: 30f603000000 |   irmovl $3, %esi #esi = 3
+  0x04e: 4065e0ffffff |   rmmovl %esi, -32(%ebp) #b[0][1] = esi
+  0x054: 30f606000000 |   irmovl $6, %esi #esi = 6
+  0x05a: 4065e4ffffff |   rmmovl %esi, -28(%ebp) #b[1][0] = esi
+  0x060: 30f608000000 |   irmovl $8, %esi #esi = 8
+  0x066: 4065e8ffffff |   rmmovl %esi, -24(%ebp) #b[1][1] = esi
+  0x06c: 30f604000000 |   irmovl $4, %esi #esi = 4
+  0x072: 4065fcffffff |   rmmovl %esi, -4(%ebp) #count = esi = 4
+  0x078: 30f600000000 |   irmovl $0, %esi #esi = 0
+  0x07e: 406500000000 |   rmmovl %esi, (%ebp) #i = esi = 0
+  0x084: 2050         |   rrmovl %ebp, %eax #eax = ebp, then subtract 48 (ADDR 00d0)
+  0x086: 30f6ecffffff |   irmovl $-20, %esi
+  0x08c: 6060         |   addl %esi, %eax #eax = a[][]
+  0x08e: 2053         |   rrmovl %ebp, %ebx #ebx = ebp, then subtract 64 (ADDR 00c0)
+  0x090: 30f6dcffffff |   irmovl $-36, %esi
+  0x096: 6063         |   addl %esi, %ebx #ebx = b[][]
+  0x098: 2051         |   rrmovl %ebp, %ecx #ecx = ebp, then subtract 80 (ADDR 00b0)
+  0x09a: 30f6ccffffff |   irmovl $-52, %esi
+  0x0a0: 6061         |   addl %esi, %ecx #ecx = c[][]
+  0x0a2: 2052         |   rrmovl %ebp, %edx #edx = ebp, then subtract 28 (ADDR 00e4)
+  0x0a4: 30f600000000 |   irmovl $0, %esi
+  0x0aa: 6062         |   addl %esi, %edx #edx = i
+  0x0ac:              | L1:
+  0x0ac: 30f600000000 |   irmovl $0, %esi
+  0x0b2: 506000000000 |   mrmovl (%eax), %esi #esi = *pa
+  0x0b8: 30f700000000 |   irmovl $0, %edi
+  0x0be: 507300000000 |   mrmovl (%ebx), %edi #edi = *pb
+  0x0c4: 6067         |   addl %esi, %edi #edi = *pa + *pb
+  0x0c6: 407100000000 |   rmmovl %edi, (%ecx) #*pc = *pa + *pb
+  0x0cc: 30f604000000 |   irmovl $4, %esi #esi = 4
+  0x0d2: 6060         |   addl %esi, %eax #pa +=1
+  0x0d4: 6063         |   addl %esi, %ebx #pb +=1
+  0x0d6: 6061         |   addl %esi, %ecx #pc +=1
+  0x0d8: 30f601000000 |   irmovl $1, %esi #esi = 1
+  0x0de: 30f700000000 |   irmovl $0, %edi #clear edi
+  0x0e4: 507200000000 |   mrmovl (%edx), %edi #edi = *i
+  0x0ea: 6067         |   addl %esi, %edi #i++
+  0x0ec: 407200000000 |   rmmovl %edi, (%edx) #setting value of i in mem
+  0x0f2: 5065fcffffff |   mrmovl -4(%ebp), %esi #esi = count
+                      |   #is line is here to replace mul. All that has to be changed are the first two numbers to the mul OpCode.
+                      |   #mul $-1, %esi #esi = i * -1   THIS LINE WONT WORK, WHEN COMPILING REMOVE IT, AND ADD IT INTO THE BINARY MANUALLY.
+  0x0f8: 6176         |   subl %edi, %esi #edi = count - i
+  0x0fa: 7304010000   |   je L2 #jump if count>i     (i<count)
+  0x0ff: 70ac000000   |   jmp L1
+  0x104:              | L2:
+  0x104: 00           |   halt
+                      | 
+  0x140:              | .pos 0x140
+  0x140:              | Stack:
